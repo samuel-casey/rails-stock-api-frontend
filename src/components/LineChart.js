@@ -1,11 +1,23 @@
 import React, { useEffect } from 'react';
 import Chart from 'chart.js';
 
-const LineChart = () => {
+const LineChart = ({ stock }) => {
+	let symbolId;
+
+	if (stock === 'AAPL') {
+		symbolId = 1;
+	} else if (stock === 'GOOG') {
+		symbolId = 2;
+	} else if (stock === 'TSLA') {
+		symbolId = 3;
+	}
+
 	useEffect(() => {
 		const makeAPICall = async () => {
 			try {
-				const res = await fetch('http://localhost:3000/stocks/1');
+				const res = await fetch(
+					`http://localhost:3000/stocks/${stock ? symbolId : 1}`
+				);
 				const json = await res.json();
 				console.log('LineChart - json', json);
 				const formattedLineData = prepareLineData(json);
@@ -15,7 +27,7 @@ const LineChart = () => {
 			}
 		};
 		makeAPICall();
-	}, []);
+	}, [stock]);
 
 	const prepareLineData = (data) => {
 		const lineChartData = {
@@ -48,7 +60,7 @@ const LineChart = () => {
 
 	return (
 		<>
-			<h1>Line Chart</h1>
+			<h1>{stock} Line Chart</h1>
 			<canvas id='lineChart' width='300' height='100'></canvas>
 		</>
 	);

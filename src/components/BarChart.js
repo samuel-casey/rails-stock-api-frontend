@@ -1,11 +1,23 @@
 import React, { useEffect } from 'react';
 import Chart from 'chart.js';
 
-const BarChart = () => {
+const BarChart = ({ stock }) => {
+	let symbolId;
+
+	if (stock === 'AAPL') {
+		symbolId = 1;
+	} else if (stock === 'GOOG') {
+		symbolId = 2;
+	} else if (stock === 'TSLA') {
+		symbolId = 3;
+	}
+
 	useEffect(() => {
 		const makeAPICall = async () => {
 			try {
-				const res = await fetch('http://localhost:3000/stocks/1');
+				const res = await fetch(
+					`http://localhost:3000/stocks/${stock ? symbolId : 1}`
+				);
 				const json = await res.json();
 				console.log('BarChart - json', json);
 				const formattedBarData = prepareBarData(json);
@@ -15,28 +27,14 @@ const BarChart = () => {
 			}
 		};
 		makeAPICall();
-	}, []);
+	}, [stock]);
 
 	const prepareBarData = (data) => {
 		const barChartData = {
 			labels: [],
 			datasets: [
 				{
-					label: "Day's Avg Price USD",
-					data: [],
-					borderColor: '#FFB3B350',
-					borderWidth: '2',
-					backgroundColor: '#FFB3B330',
-				},
-				{
-					label: 'Avg. Low',
-					data: [],
-					borderColor: '#99DDFF',
-					borderWidth: '2',
-					backgroundColor: '#99DDFF30',
-				},
-				{
-					label: 'Variance',
+					label: "Day's Avg. Price USD",
 					data: [],
 					borderColor: '#DDCCFF',
 					borderWidth: '2',
@@ -45,7 +43,7 @@ const BarChart = () => {
 			],
 		};
 
-		data.average_price.forEach((price) => {
+		data.average_prices.forEach((price) => {
 			barChartData.labels.push(price.date);
 			barChartData.datasets[0].data.push(price.price_USD);
 		});
@@ -62,7 +60,7 @@ const BarChart = () => {
 
 	return (
 		<>
-			<h1>Bar Chart</h1>
+			<h1>{stock} Bar Chart</h1>
 			<canvas id='barChart' width='300' height='100'></canvas>
 		</>
 	);
